@@ -1,4 +1,4 @@
-﻿using System.IO.MemoryMappedFiles;
+using System.IO.MemoryMappedFiles;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -139,6 +139,25 @@ public unsafe class DataFile : IDisposable
         GetString(stringsOffset, charsOffset, i + 1, out value);
     }
 
+    public static string[] TypeOfGeoList =
+    {
+        "highway",
+        "water",
+        "railway",
+        "natural",
+        "boundary",
+        "landuse",
+        "residential",
+        "farm",
+        "reservoir",
+        "building",
+        "leisure",
+        "amenity",
+        "name",
+        "place",
+        "admin_level"
+    };
+
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public void ForeachFeature(BoundingBox b, MapFeatureDelegate? action)
     {
@@ -182,10 +201,11 @@ public unsafe class DataFile : IDisposable
                     for (var p = 0; p < feature->PropertyCount; ++p)
                     {
                         GetProperty(header.Tile.Value.StringsOffsetInBytes, header.Tile.Value.CharactersOffsetInBytes, p * 2 + feature->PropertiesOffset, out var key, out var value);
+                        if (!TypeOfGeoList.Contains(key.ToString())) continue;
                         try
                         {
                             TypeOfGeo geoTypeKey = (TypeOfGeo)Enum.Parse(typeof(TypeOfGeo), key.ToString());
-                            properties.Add(geoTypeKey, value.ToString());
+                            properties.Add(geoTypeKey, value.ToString());  
                         } catch (Exception e)
                         {
                             continue;
